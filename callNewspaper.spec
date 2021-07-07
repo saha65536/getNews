@@ -1,5 +1,4 @@
-# -*- mode: python ; coding: utf-8 -*-
-
+# -*- mode: python -*-
 
 block_cipher = None
 
@@ -7,8 +6,7 @@ block_cipher = None
 a = Analysis(['callNewspaper.py'],
              pathex=['D:\\eric6-21.6\\workspace\\newspaper'],
              binaries=[],
-             datas=[('C:\\Users\\saha\\AppData\\Roaming\\Python\\Python37\\site-packages\\newspaper\\resources\\text\\*.txt', 'text'),
-			('C:\\Users\\saha\\AppData\\Roaming\\Python\\Python37\\site-packages\\newspaper\\resources\\misc\\*.txt', 'misc'),],
+             datas=[],
              hiddenimports=['newspaper3k', 'beautifulsoup4', 'cssselect', 'feedfinder2', 'feedparser', 'jieba3k', 'lxml', 'nltk', 'Pillow', 'pythainlp', 'python-dateutil', 'PyYAML', 'requests', 'tinysegmenter', 'tldextract'],
              hookspath=[],
              runtime_hooks=[],
@@ -17,23 +15,56 @@ a = Analysis(['callNewspaper.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
+			 
+
+
+
+#######!!!注意点1：加载自己的资源文件#####################
+def extra_datas(mydir):
+    def rec_glob(p, files):
+        import os
+        import glob
+        for d in glob.glob(p):
+            if os.path.isfile(d):
+                files.append(d)
+            rec_glob("%s/*" % d, files)
+    files = []
+    rec_glob("%s/*" % mydir, files)
+    extra_datas = []
+    for f in files:
+        extra_datas.append((f, f, 'DATA'))
+
+    return extra_datas
+
+# append the 'Resources' dir
+a.datas += extra_datas('res')	 ###这里是自己的资源文件夹		
+a.datas += extra_datas('qss')	 ###这里是自己的资源文件夹	
+a.datas += extra_datas('config')
+a.datas += extra_datas('jieba')
+a.datas += extra_datas('newspaper')
+################################################
+			 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
+
+			 
 exe = EXE(pyz,
           a.scripts,
           [],
-          exclude_binaries=True,
-          name='callNewspaper',
+          exclude_binaries=True,   ###!!!注意点3：这里是True
+          name='callNewsPaper',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=True )
+          console=False,
+          icon='D:\\eric6-21.6\\workspace\\newspaper\\res\\title.ico')
+
+
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
                strip=False,
                upx=True,
-               upx_exclude=[],
-               name='callNewspaper')
+               name='callNewsPaper')
